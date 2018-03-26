@@ -71,51 +71,44 @@ Wikipedia says
 
 **Programmatic Example**
 
-First of all we have a door interface and the implementation
-```php
-interface Door
-{
-    public function getWidth(): float;
-    public function getHeight(): float;
-}
+First of all we have a door class and the implementation
+```python
+class Door:
 
-class WoodenDoor implements Door
-{
-    protected $width;
-    protected $height;
+    def get_width(self):
+        raise NotImplementedError
 
-    public function __construct(float $width, float $height)
-    {
-        $this->width = $width;
-        $this->height = $height;
-    }
+    def get_height(self):
+        raise NotImplementedError
 
-    public function getWidth(): float
-    {
-        return $this->width;
-    }
+class WoodenDoor(Door):
 
-    public function getHeight(): float
-    {
-        return $this->height;
-    }
-}
+    def __init__(self, width, height):
+        self.width = width
+        self.height = height
+
+    def get_width(self):
+        return self.width
+
+    def get_height(self):
+        return self.height
 ```
 Then we have our door factory that makes the door and returns it
-```php
-class DoorFactory
-{
-    public static function makeDoor($width, $height): Door
-    {
-        return new WoodenDoor($width, $height);
-    }
-}
+```python
+class DoorFactory:
+
+    @staticmethod
+    def make_door(width, height):
+        return WoodenDoor(width, height)
 ```
 And then it can be used as
-```php
-$door = DoorFactory::makeDoor(100, 200);
-echo 'Width: ' . $door->getWidth();
-echo 'Height: ' . $door->getHeight();
+```python
+if __name__ == '__main__':
+
+    door = DoorFactory().make_door(100, 200)
+
+    assert door.get_width() == 100
+    assert door.get_height() == 200
 ```
 
 **When to Use?**
@@ -138,72 +131,64 @@ Wikipedia says
 
 Taking our hiring manager example above. First of all we have an interviewer interface and some implementations for it
 
-```php
-interface Interviewer
-{
-    public function askQuestions();
-}
+```python
+class Interviewer:
 
-class Developer implements Interviewer
-{
-    public function askQuestions()
-    {
-        echo 'Asking about design patterns!';
-    }
-}
+    @staticmethod
+    def ask_questions():
+        raise NotImplementedError
 
-class CommunityExecutive implements Interviewer
-{
-    public function askQuestions()
-    {
-        echo 'Asking about community building';
-    }
-}
+
+class Developer(Interviewer):
+
+    def ask_questions(self):
+        print('Asking about design patterns!')
+
+
+class CommunityExecutive(Interviewer):
+
+    def ask_questions(self):
+        print('Asking about community building')
 ```
 
 Now let us create our `HiringManager`
 
-```php
-abstract class HiringManager
-{
+```python
+class HiringManager:
 
-    // Factory method
-    abstract protected function makeInterviewer(): Interviewer;
+    def make_interviewer(self):
+        raise NotImplementedError
 
-    public function takeInterview()
-    {
-        $interviewer = $this->makeInterviewer();
-        $interviewer->askQuestions();
-    }
-}
+    def take_interview(self):
+        interviewer = self.make_interviewer()
+        interviewer.ask_questions()
 
 ```
 Now any child can extend it and provide the required interviewer
-```php
-class DevelopmentManager extends HiringManager
-{
-    protected function makeInterviewer(): Interviewer
-    {
-        return new Developer();
-    }
-}
+```python
+class DevelopmentManager(HiringManager):
 
-class MarketingManager extends HiringManager
-{
-    protected function makeInterviewer(): Interviewer
-    {
-        return new CommunityExecutive();
-    }
-}
+    def make_interviewer(self):
+        return Developer()
+
+
+class MarketingManager(HiringManager):
+
+    def make_interviewer(self):
+        return CommunityExecutive()
 ```
 and then it can be used as
 
-```php
-$devManager = new DevelopmentManager();
-$devManager->takeInterview(); // Output: Asking about design patterns
+```python
+if __name__ == '__main__':
 
-$marketingManager = new MarketingManager();
-$marketingManager->takeInterview(); // Output: Asking about community building.
+    dev_manager = DevelopmentManager()
+    dev_manager.take_interview()
+    # Output: Asking about design patterns!
+
+    mkt_manager = MarketingManager()
+    mkt_manager.take_interview()
+    # Output: Asking about community building
 ```
 
 **When to use?**
@@ -226,107 +211,94 @@ Wikipedia says
 
 Translating the door example above. First of all we have our `Door` interface and some implementation for it
 
-```php
-interface Door
-{
-    public function getDescription();
-}
+```python
+class Door:
 
-class WoodenDoor implements Door
-{
-    public function getDescription()
-    {
-        echo 'I am a wooden door';
-    }
-}
+    def get_description(self):
+        raise NotImplementedError
 
-class IronDoor implements Door
-{
-    public function getDescription()
-    {
-        echo 'I am an iron door';
-    }
-}
+
+class WoodenDoor(Door):
+
+    def get_description(self):
+        print('I am a wooden door')
+
+
+class IronDoor(Door):
+
+    def get_description(self):
+        print('I am a iron door')
 ```
 Then we have some fitting experts for each door type
 
-```php
-interface DoorFittingExpert
-{
-    public function getDescription();
-}
+```python
+class DoorFittingexpert:
 
-class Welder implements DoorFittingExpert
-{
-    public function getDescription()
-    {
-        echo 'I can only fit iron doors';
-    }
-}
+    def get_description(self):
+        raise NotImplementedError
 
-class Carpenter implements DoorFittingExpert
-{
-    public function getDescription()
-    {
-        echo 'I can only fit wooden doors';
-    }
-}
+
+class Welder(DoorFittingexpert):
+
+    def get_description(self):
+        print('I can only fit iron doors')
+
+
+class Carpenter(DoorFittingexpert):
+
+    def get_description(self):
+        print('I can only fit wooden doors')
 ```
 
 Now we have our abstract factory that would let us make family of related objects i.e. wooden door factory would create a wooden door and wooden door fitting expert and iron door factory would create an iron door and iron door fitting expert
-```php
-interface DoorFactory
-{
-    public function makeDoor(): Door;
-    public function makeFittingExpert(): DoorFittingExpert;
-}
+```python
+class DoorFactory:
 
-// Wooden factory to return carpenter and wooden door
-class WoodenDoorFactory implements DoorFactory
-{
-    public function makeDoor(): Door
-    {
-        return new WoodenDoor();
-    }
+    def make_door(self):
+        raise NotImplementedError
 
-    public function makeFittingExpert(): DoorFittingExpert
-    {
-        return new Carpenter();
-    }
-}
+    def make_fitting_expert(self):
+        raise NotImplementedError
 
-// Iron door factory to get iron door and the relevant fitting expert
-class IronDoorFactory implements DoorFactory
-{
-    public function makeDoor(): Door
-    {
-        return new IronDoor();
-    }
 
-    public function makeFittingExpert(): DoorFittingExpert
-    {
-        return new Welder();
-    }
-}
+class WoodenDoorFactory(DoorFactory):
+
+    def make_door(self):
+        return WoodenDoor()
+
+    def make_fitting_expert(self):
+        return Carpenter()
+
+
+class IronDoorFactory(DoorFactory):
+
+    def make_door(self):
+        return IronDoor()
+
+    def make_fitting_expert(self):
+        return Welder()
 ```
 And then it can be used as
-```php
-$woodenFactory = new WoodenDoorFactory();
+```python
+if __name__ == '__main__':
 
-$door = $woodenFactory->makeDoor();
-$expert = $woodenFactory->makeFittingExpert();
+    wooden_factory = WoodenDoorFactory()
+    door = wooden_factory.make_door()
+    expert = wooden_factory.make_fitting_expert()
+    door.get_description()
+    expert.get_description()
 
-$door->getDescription();  // Output: I am a wooden door
-$expert->getDescription(); // Output: I can only fit wooden doors
+    # I am a wooden door
+    # I can only fit wooden doors
 
-// Same for Iron Factory
-$ironFactory = new IronDoorFactory();
+    iron_factory = IronDoorFactory()
+    door = iron_factory.make_door()
+    expert = iron_factory.make_fitting_expert()
+    door.get_description()
+    expert.get_description()
 
-$door = $ironFactory->makeDoor();
-$expert = $ironFactory->makeFittingExpert();
-
-$door->getDescription();  // Output: I am an iron door
-$expert->getDescription(); // Output: I can only fit iron doors
+    # I am a iron door
+    # I can only fit iron doors
 ```
 
 As you can see the wooden door factory has encapsulated the `carpenter` and the `wooden door` also iron door factory has encapsulated the `iron door` and `welder`. And thus it had helped us make sure that for each of the created door, we do not get a wrong fitting expert.   
@@ -348,8 +320,8 @@ Wikipedia says
 
 Having said that let me add a bit about what telescoping constructor anti-pattern is. At one point or the other we have all seen a constructor like below:
 
-```php
-public function __construct($size, $cheese = true, $pepperoni = true, $tomato = false, $lettuce = true)
+```python
+def __init__(self, size, cheese = true, pepperoni = true, tomato = false, lettuce = true)
 {
 }
 ```
@@ -360,82 +332,53 @@ As you can see; the number of constructor parameters can quickly get out of hand
 
 The sane alternative is to use the builder pattern. First of all we have our burger that we want to make
 
-```php
-class Burger
-{
-    protected $size;
+```python
+class Burger:
 
-    protected $cheese = false;
-    protected $pepperoni = false;
-    protected $lettuce = false;
-    protected $tomato = false;
-
-    public function __construct(BurgerBuilder $builder)
-    {
-        $this->size = $builder->size;
-        $this->cheese = $builder->cheese;
-        $this->pepperoni = $builder->pepperoni;
-        $this->lettuce = $builder->lettuce;
-        $this->tomato = $builder->tomato;
-    }
-}
+    def __init__(self, builder):
+        self.size = builder.size
+        self.cheese = builder.cheese
+        self.pepperoni = builder.pepperoni
+        self.lettuce = builder.lettuce
+        self.tomato = builder.tomato
 ```
 
 And then we have the builder
 
-```php
-class BurgerBuilder
-{
-    public $size;
+```python
+class BurgerBuilder:
 
-    public $cheese = false;
-    public $pepperoni = false;
-    public $lettuce = false;
-    public $tomato = false;
+    def __init__(self, size):
+        self.size = size
+        self.cheese = False
+        self.pepperoni = False
+        self.lettuce = False
+        self.tomato = False
 
-    public function __construct(int $size)
-    {
-        $this->size = $size;
-    }
+    def add_cheese(self):
+        self.cheese = True
 
-    public function addPepperoni()
-    {
-        $this->pepperoni = true;
-        return $this;
-    }
+    def add_pepperoni(self):
+        self.pepperoni = True
 
-    public function addLettuce()
-    {
-        $this->lettuce = true;
-        return $this;
-    }
+    def add_lettuce(self):
+        self.lettuce = True
 
-    public function addCheese()
-    {
-        $this->cheese = true;
-        return $this;
-    }
+    def add_tomato(self):
+        self.tomato = True
 
-    public function addTomato()
-    {
-        $this->tomato = true;
-        return $this;
-    }
-
-    public function build(): Burger
-    {
-        return new Burger($this);
-    }
-}
+    def build(self):
+        return Burger(self)
 ```
 And then it can be used as:
 
-```php
-$burger = (new BurgerBuilder(14))
-                    ->addPepperoni()
-                    ->addLettuce()
-                    ->addTomato()
-                    ->build();
+```python
+if __name__ == '__main__':
+
+    burger = BurgerBuilder(6)
+    burger.add_cheese()
+    burger.add_lettuce()
+    burger.build()
 ```
 
 **When to use?**
@@ -457,55 +400,41 @@ In short, it allows you to create a copy of an existing object and modify it to 
 
 **Programmatic Example**
 
-In PHP, it can be easily done using `clone`
+In Python, it can be easily done using `copy`
 
-```php
-class Sheep
-{
-    protected $name;
-    protected $category;
+```python
+class Sheep:
 
-    public function __construct(string $name, string $category = 'Mountain Sheep')
-    {
-        $this->name = $name;
-        $this->category = $category;
-    }
+    def __init__(self, name, category='Mountain Sheep'):
+        self.name = name
+        self.category = category
 
-    public function setName(string $name)
-    {
-        $this->name = $name;
-    }
+    def set_name(self, name):
+        self.name = name
 
-    public function getName()
-    {
-        return $this->name;
-    }
+    def get_name(self):
+        return self.name
 
-    public function setCategory(string $category)
-    {
-        $this->category = $category;
-    }
+    def set_category(self, category):
+        self.category = category
 
-    public function getCategory()
-    {
-        return $this->category;
-    }
-}
+    def get_category(self):
+        return self.category
+
 ```
 Then it can be cloned like below
-```php
-$original = new Sheep('Jolly');
-echo $original->getName(); // Jolly
-echo $original->getCategory(); // Mountain Sheep
+```python
+if __name__ == '__main__':
 
-// Clone and modify what is required
-$cloned = clone $original;
-$cloned->setName('Dolly');
-echo $cloned->getName(); // Dolly
-echo $cloned->getCategory(); // Mountain sheep
+    original = Sheep('Jolly')
+    assert original.get_name() == 'Jolly'
+    assert original.get_category() == 'Mountain Sheep'
+
+    cloned = copy.deepcopy(original)
+    cloned.set_name('Dolly')
+    assert cloned.get_name() == 'Dolly'
+    assert cloned.get_category() == 'Mountain Sheep'
 ```
-
-Also you could use the magic method `__clone` to modify the cloning behavior.
 
 **When to use?**
 
@@ -527,42 +456,23 @@ Singleton pattern is actually considered an anti-pattern and overuse of it shoul
 **Programmatic Example**
 
 To create a singleton, make the constructor private, disable cloning, disable extension and create a static variable to house the instance
-```php
-final class President
-{
-    private static $instance;
+```python
+class President:
+    instance = None
 
-    private function __construct()
-    {
-        // Hide the constructor
-    }
-
-    public static function getInstance(): President
-    {
-        if (!self::$instance) {
-            self::$instance = new self();
-        }
-
-        return self::$instance;
-    }
-
-    private function __clone()
-    {
-        // Disable cloning
-    }
-
-    private function __wakeup()
-    {
-        // Disable unserialize
-    }
-}
+    @classmethod
+    def get_instance(cls):
+        if not cls.instance:
+            cls.instance = President()
+        return cls.instance
 ```
 Then in order to use
-```php
-$president1 = President::getInstance();
-$president2 = President::getInstance();
+```python
+if __name__ == '__main__':
 
-var_dump($president1 === $president2); // true
+    president1 = President().get_instance()
+    president2 = President().get_instance()
+    assert president1 is president2
 ```
 
 Structural Design Patterns
@@ -598,73 +508,60 @@ Wikipedia says
 
 Consider a game where there is a hunter and he hunts lions.
 
-First we have an interface `Lion` that all types of lions have to implement
+First we have an class `Lion` that all types of lions can extend
 
-```php
-interface Lion
-{
-    public function roar();
-}
+```python
+class Lion:
 
-class AfricanLion implements Lion
-{
-    public function roar()
-    {
-    }
-}
+    def roar(self):
+        raise NotImplementedError
 
-class AsianLion implements Lion
-{
-    public function roar()
-    {
-    }
-}
+
+class AfricanLion(Lion):
+
+    def roar():
+        pass
+
+
+class AsianLion(Lion):
+
+    def roar():
+        pass
 ```
 And hunter expects any implementation of `Lion` interface to hunt.
-```php
-class Hunter
-{
-    public function hunt(Lion $lion)
-    {
-    }
-}
+```python
+class Hunter:
+
+    def hunt(self, lion):
+        pass
 ```
 
 Now let's say we have to add a `WildDog` in our game so that hunter can hunt that also. But we can't do that directly because dog has a different interface. To make it compatible for our hunter, we will have to create an adapter that is compatible
 
-```php
-// This needs to be added to the game
-class WildDog
-{
-    public function bark()
-    {
-    }
-}
+```python
+class WildDog:
 
-// Adapter around wild dog to make it compatible with our game
-class WildDogAdapter implements Lion
-{
-    protected $dog;
+    def bark(self):
+        pass
 
-    public function __construct(WildDog $dog)
-    {
-        $this->dog = $dog;
-    }
 
-    public function roar()
-    {
-        $this->dog->bark();
-    }
-}
+class WildDogAdapter(Lion):
+
+    def __init__(self, dog):
+        self.dog = dog
+
+    def roar(self):
+        self.dog.bark()
 ```
 And now the `WildDog` can be used in our game using `WildDogAdapter`.
 
-```php
-$wildDog = new WildDog();
-$wildDogAdapter = new WildDogAdapter($wildDog);
+```python
+if __name__ == '__main__':
 
-$hunter = new Hunter();
-$hunter->hunt($wildDogAdapter);
+    wild_dog = WildDog()
+    wild_dog_adapter = WildDogAdapter(wild_dog)
+    hunter = Hunter()
+    hunter.hunt(wild_dog_adapter)
 ```
 
 🚡 Bridge
@@ -684,82 +581,65 @@ Wikipedia says
 
 Translating our WebPage example from above. Here we have the `WebPage` hierarchy
 
-```php
-interface WebPage
-{
-    public function __construct(Theme $theme);
-    public function getContent();
-}
+```python
+class WebPage:
 
-class About implements WebPage
-{
-    protected $theme;
+    def get_content(self):
+        raise NotImplementedError
 
-    public function __construct(Theme $theme)
-    {
-        $this->theme = $theme;
-    }
 
-    public function getContent()
-    {
-        return "About page in " . $this->theme->getColor();
-    }
-}
+class About(WebPage):
 
-class Careers implements WebPage
-{
-    protected $theme;
+    def __init__(self, theme):
+        self.theme = theme
 
-    public function __construct(Theme $theme)
-    {
-        $this->theme = $theme;
-    }
+    def get_content(self):
+        return 'About page in ' + self.theme.get_color()
 
-    public function getContent()
-    {
-        return "Careers page in " . $this->theme->getColor();
-    }
-}
+
+class Careers(WebPage):
+
+    def __init__(self, theme):
+        self.theme = theme
+
+    def get_content(self):
+        return 'Careers page in ' + self.theme.get_color()
 ```
 And the separate theme hierarchy
-```php
+```python
 
-interface Theme
-{
-    public function getColor();
-}
+class Theme:
 
-class DarkTheme implements Theme
-{
-    public function getColor()
-    {
-        return 'Dark Black';
-    }
-}
-class LightTheme implements Theme
-{
-    public function getColor()
-    {
-        return 'Off white';
-    }
-}
-class AquaTheme implements Theme
-{
-    public function getColor()
-    {
-        return 'Light blue';
-    }
-}
+    def get_color(self):
+        pass
+
+
+class DarkTheme(Theme):
+
+    def get_color(self):
+        return 'Dark Black'
+
+
+class LightTheme(Theme):
+
+    def get_color(self):
+        return 'Off White'
+
+
+class AquaTheme(Theme):
+
+    def get_color(self):
+        return 'Light Blue'
 ```
 And both the hierarchies
-```php
-$darkTheme = new DarkTheme();
+```python
+if __name__ == '__main__':
 
-$about = new About($darkTheme);
-$careers = new Careers($darkTheme);
-
-echo $about->getContent(); // "About page in Dark Black";
-echo $careers->getContent(); // "Careers page in Dark Black";
+    dark_theme = DarkTheme()
+    about = About(dark_theme)
+    careers = Careers(dark_theme)
+    assert about.get_content() == 'About page in Dark Black'
+    assert careers.get_content() == 'Careers page in Dark Black'
 ```
 
 🌿 Composite
@@ -778,121 +658,89 @@ Wikipedia says
 
 Taking our employees example from above. Here we have different employee types
 
-```php
-interface Employee
-{
-    public function __construct(string $name, float $salary);
-    public function getName(): string;
-    public function setSalary(float $salary);
-    public function getSalary(): float;
-    public function getRoles(): array;
-}
+```python
+class Employee:
 
-class Developer implements Employee
-{
-    protected $salary;
-    protected $name;
-    protected $roles;
-    
-    public function __construct(string $name, float $salary)
-    {
-        $this->name = $name;
-        $this->salary = $salary;
-    }
+    def get_name(self):
+        raise NotImplementedError
 
-    public function getName(): string
-    {
-        return $this->name;
-    }
+    def set_salary(self, salary):
+        raise NotImplementedError
 
-    public function setSalary(float $salary)
-    {
-        $this->salary = $salary;
-    }
+    def get_salary(self):
+        raise NotImplementedError
 
-    public function getSalary(): float
-    {
-        return $this->salary;
-    }
+    def get_roles(self):
+        raise NotImplementedError
 
-    public function getRoles(): array
-    {
-        return $this->roles;
-    }
-}
 
-class Designer implements Employee
-{
-    protected $salary;
-    protected $name;
-    protected $roles;
+class Developer(Employee):
 
-    public function __construct(string $name, float $salary)
-    {
-        $this->name = $name;
-        $this->salary = $salary;
-    }
+    def __init__(self, name, salary):
+        self.name = name
+        self.salary = salary
 
-    public function getName(): string
-    {
-        return $this->name;
-    }
+    def get_name(self):
+        return self.name
 
-    public function setSalary(float $salary)
-    {
-        $this->salary = $salary;
-    }
+    def set_salary(self, salary):
+        self.salary = salary
 
-    public function getSalary(): float
-    {
-        return $this->salary;
-    }
+    def get_salary(self):
+        return self.salary
 
-    public function getRoles(): array
-    {
-        return $this->roles;
-    }
-}
+    def get_roles(self):
+        return self.roles
+
+
+class Designer(Employee):
+
+    def __init__(self, name, salary):
+        self.name = name
+        self.salary = salary
+
+    def get_name(self):
+        return self.name
+
+    def set_salary(self, salary):
+        self.salary = salary
+
+    def get_salary(self):
+        return self.salary
+
+    def get_roles(self):
+        return self.roles
 ```
 
 Then we have an organization which consists of several different types of employees
 
-```php
-class Organization
-{
-    protected $employees;
+```python
+class Organization:
 
-    public function addEmployee(Employee $employee)
-    {
-        $this->employees[] = $employee;
-    }
+    def __init__(self):
+        self.employees = []
 
-    public function getNetSalaries(): float
-    {
-        $netSalary = 0;
+    def add_employee(self, employee):
+        self.employees.append(employee)
 
-        foreach ($this->employees as $employee) {
-            $netSalary += $employee->getSalary();
-        }
-
-        return $netSalary;
-    }
-}
+    def get_net_salaries(self):
+        net_salary = 0
+        for employee in self.employees:
+            net_salary += employee.get_salary()
+        return net_salary
 ```
 
 And then it can be used as
 
-```php
-// Prepare the employees
-$john = new Developer('John Doe', 12000);
-$jane = new Designer('Jane Doe', 15000);
+```python
+if __name__ == '__main__':
 
-// Add them to organization
-$organization = new Organization();
-$organization->addEmployee($john);
-$organization->addEmployee($jane);
-
-echo "Net salaries: " . $organization->getNetSalaries(); // Net Salaries: 27000
+    john = Developer('John Doe', 12000)
+    jane = Designer('Jane Doe', 10000)
+    organization = Organization()
+    organization.add_employee(john)
+    organization.add_employee(jane)
+    assert organization.get_net_salaries() == 22000
 ```
 
 ☕ Decorator
@@ -910,109 +758,84 @@ Wikipedia says
 
 **Programmatic Example**
 
-Lets take coffee for example. First of all we have a simple coffee implementing the coffee interface
+Lets take coffee for example. First of all we have a simple coffee implementing the coffee class
 
-```php
-interface Coffee
-{
-    public function getCost();
-    public function getDescription();
-}
+```python
+class Coffee:
 
-class SimpleCoffee implements Coffee
-{
-    public function getCost()
-    {
-        return 10;
-    }
+    def get_cost(self):
+        raise NotImplementedError
 
-    public function getDescription()
-    {
-        return 'Simple coffee';
-    }
-}
+    def get_description(self):
+        raise NotImplementedError
+
+
+class SimpleCoffee(Coffee):
+
+    def get_cost(self):
+        return 10
+
+    def get_description(self):
+        return 'Simple coffee'
 ```
 We want to make the code extensible to allow options to modify it if required. Lets make some add-ons (decorators)
-```php
-class MilkCoffee implements Coffee
-{
-    protected $coffee;
+```python
+class MilkCoffee(Coffee):
 
-    public function __construct(Coffee $coffee)
-    {
-        $this->coffee = $coffee;
-    }
+    def __init__(self, coffee):
+        self.coffee = coffee
 
-    public function getCost()
-    {
-        return $this->coffee->getCost() + 2;
-    }
+    def get_cost(self):
+        return self.coffee.get_cost() + 2
 
-    public function getDescription()
-    {
-        return $this->coffee->getDescription() . ', milk';
-    }
-}
+    def get_description(self):
+        return self.coffee.get_description() + ', milk'
 
-class WhipCoffee implements Coffee
-{
-    protected $coffee;
 
-    public function __construct(Coffee $coffee)
-    {
-        $this->coffee = $coffee;
-    }
+class WhipCoffee(Coffee):
 
-    public function getCost()
-    {
-        return $this->coffee->getCost() + 5;
-    }
+    def __init__(self, coffee):
+        self.coffee = coffee
 
-    public function getDescription()
-    {
-        return $this->coffee->getDescription() . ', whip';
-    }
-}
+    def get_cost(self):
+        return self.coffee.get_cost() + 5
 
-class VanillaCoffee implements Coffee
-{
-    protected $coffee;
+    def get_description(self):
+        return self.coffee.get_description() + ', whip'
 
-    public function __construct(Coffee $coffee)
-    {
-        $this->coffee = $coffee;
-    }
 
-    public function getCost()
-    {
-        return $this->coffee->getCost() + 3;
-    }
+class VanillaCoffee(Coffee):
 
-    public function getDescription()
-    {
-        return $this->coffee->getDescription() . ', vanilla';
-    }
-}
+    def __init__(self, coffee):
+        self.coffee = coffee
+
+    def get_cost(self):
+        return self.coffee.get_cost() + 3
+
+    def get_description(self):
+        return self.coffee.get_description() + ', vanilla'
 ```
 
 Lets make a coffee now
 
-```php
-$someCoffee = new SimpleCoffee();
-echo $someCoffee->getCost(); // 10
-echo $someCoffee->getDescription(); // Simple Coffee
+```python
+if __name__ == '__main__':
 
-$someCoffee = new MilkCoffee($someCoffee);
-echo $someCoffee->getCost(); // 12
-echo $someCoffee->getDescription(); // Simple Coffee, milk
+    coffee = SimpleCoffee()
+    assert coffee.get_cost() == 10
+    assert coffee.get_description() == 'Simple coffee'
 
-$someCoffee = new WhipCoffee($someCoffee);
-echo $someCoffee->getCost(); // 17
-echo $someCoffee->getDescription(); // Simple Coffee, milk, whip
+    coffee = MilkCoffee(coffee)
+    assert coffee.get_cost() == 12
+    assert coffee.get_description() == 'Simple coffee, milk'
 
-$someCoffee = new VanillaCoffee($someCoffee);
-echo $someCoffee->getCost(); // 20
-echo $someCoffee->getDescription(); // Simple Coffee, milk, whip, vanilla
+    coffee = WhipCoffee(coffee)
+    assert coffee.get_cost() == 17
+    assert coffee.get_description() == 'Simple coffee, milk, whip'
+
+    coffee = VanillaCoffee(coffee)
+    assert coffee.get_cost() == 20
+    assert coffee.get_description() == 'Simple coffee, milk, whip, vanilla'
 ```
 
 📦 Facade
@@ -1031,77 +854,64 @@ Wikipedia says
 
 Taking our computer example from above. Here we have the computer class
 
-```php
-class Computer
-{
-    public function getElectricShock()
-    {
-        echo "Ouch!";
-    }
+```python
+class Computer:
 
-    public function makeSound()
-    {
-        echo "Beep beep!";
-    }
+    def get_electric_shock(self):
+        print('Ouch!')
 
-    public function showLoadingScreen()
-    {
-        echo "Loading..";
-    }
+    def make_sound(self):
+        print('Beep beep!')
 
-    public function bam()
-    {
-        echo "Ready to be used!";
-    }
+    def show_loading_screen(self):
+        print('Loading...')
 
-    public function closeEverything()
-    {
-        echo "Bup bup bup buzzzz!";
-    }
+    def bam(self):
+        print('Ready to be used!')
 
-    public function sooth()
-    {
-        echo "Zzzzz";
-    }
+    def close_everything(self):
+        print('Bup bup bup buzzzz!')
 
-    public function pullCurrent()
-    {
-        echo "Haaah!";
-    }
-}
+    def sooth(self):
+        print('Zzz...')
+
+    def pull_current(self):
+        print('Haaaah!')
 ```
 Here we have the facade
-```php
-class ComputerFacade
-{
-    protected $computer;
+```python
+class ComputerFacade:
 
-    public function __construct(Computer $computer)
-    {
-        $this->computer = $computer;
-    }
+    def __init__(self, computer):
+        self.computer = computer
 
-    public function turnOn()
-    {
-        $this->computer->getElectricShock();
-        $this->computer->makeSound();
-        $this->computer->showLoadingScreen();
-        $this->computer->bam();
-    }
+    def turn_on(self):
+        self.computer.get_electric_shock()
+        self.computer.make_sound()
+        self.computer.show_loading_screen()
+        self.computer.bam()
 
-    public function turnOff()
-    {
-        $this->computer->closeEverything();
-        $this->computer->pullCurrent();
-        $this->computer->sooth();
-    }
-}
+    def turn_off(self):
+        self.computer.close_everything()
+        self.computer.pull_current()
+        self.computer.sooth()
 ```
 Now to use the facade
-```php
-$computer = new ComputerFacade(new Computer());
-$computer->turnOn(); // Ouch! Beep beep! Loading.. Ready to be used!
-$computer->turnOff(); // Bup bup buzzz! Haah! Zzzzz
+```python
+if __name__ == '__main__':
+
+    computer = ComputerFacade(Computer())
+
+    computer.turn_on()
+    # Ouch!
+    # Beep beep!
+    # Loading...
+    # Ready to be used!
+
+    computer.turn_off()
+    # Bup bup bup buzzzz!
+    # Haaaah!
+    # Zzz...
 ```
 
 🍃 Flyweight
@@ -1120,69 +930,60 @@ Wikipedia says
 
 Translating our tea example from above. First of all we have tea types and tea maker
 
-```php
-// Anything that will be cached is flyweight.
-// Types of tea here will be flyweights.
-class KarakTea
-{
-}
+```python
+from collections import defaultdict
 
-// Acts as a factory and saves the tea
-class TeaMaker
-{
-    protected $availableTea = [];
 
-    public function make($preference)
-    {
-        if (empty($this->availableTea[$preference])) {
-            $this->availableTea[$preference] = new KarakTea();
-        }
+class KarakTea:
+    # Anything that will be cached is flyweight
+    # Types of tea here will be flyweights
+    pass
 
-        return $this->availableTea[$preference];
-    }
-}
+
+class TeaMaker:
+    # Acts as a factory and saves the tea
+
+    def __init__(self):
+        self.availible_tea = defaultdict(list)
+
+    def make(self, preference):
+        if len(self.availible_tea[preference]) == 0:
+            self.availible_tea[preference] = KarakTea()
+        return self.availible_tea[preference]
+
 ```
 
 Then we have the `TeaShop` which takes orders and serves them
 
-```php
-class TeaShop
-{
-    protected $orders;
-    protected $teaMaker;
+```python
+class TeaShop:
 
-    public function __construct(TeaMaker $teaMaker)
-    {
-        $this->teaMaker = $teaMaker;
-    }
+    def __init__(self, tea_maker):
+        self.tea_maker = tea_maker
+        self.orders = dict()
 
-    public function takeOrder(string $teaType, int $table)
-    {
-        $this->orders[$table] = $this->teaMaker->make($teaType);
-    }
+    def take_order(self, tea_type, table):
+        self.orders[table] = self.tea_maker.make(tea_type)
 
-    public function serve()
-    {
-        foreach ($this->orders as $table => $tea) {
-            echo "Serving tea to table# " . $table;
-        }
-    }
-}
+    def serve(self):
+        for table in self.orders.keys():
+            print('Serving tea to table #' + str(table))
+
 ```
 And it can be used as below
 
-```php
-$teaMaker = new TeaMaker();
-$shop = new TeaShop($teaMaker);
+```python
+if __name__ == '__main__':
 
-$shop->takeOrder('less sugar', 1);
-$shop->takeOrder('more milk', 2);
-$shop->takeOrder('without sugar', 5);
-
-$shop->serve();
-// Serving tea to table# 1
-// Serving tea to table# 2
-// Serving tea to table# 5
+    tea_maker = TeaMaker()
+    shop = TeaShop(tea_maker)
+    shop.take_order('less suger', 1)
+    shop.take_order('more milk', 2)
+    shop.take_order('without suger', 5)
+    shop.serve()
+    # Serving tea to table #1
+    # Serving tea to table #2
+    # Serving tea to table #5
 ```
 
 🎱 Proxy
@@ -1200,64 +1001,52 @@ Wikipedia says
 
 Taking our security door example from above. Firstly we have the door interface and an implementation of door
 
-```php
-interface Door
-{
-    public function open();
-    public function close();
-}
+```python
+class Door:
 
-class LabDoor implements Door
-{
-    public function open()
-    {
-        echo "Opening lab door";
-    }
+    def open(self):
+        raise NotImplementedError
 
-    public function close()
-    {
-        echo "Closing the lab door";
-    }
-}
+    def close(self):
+        raise NotImplementedError
+
+
+class LabDoor(Door):
+
+    def open(self):
+        print('Opening lab door')
+
+    def close(self):
+        print('Closing the lab door')
+
 ```
 Then we have a proxy to secure any doors that we want
-```php
-class SecuredDoor
-{
-    protected $door;
+```python
+class SecurityDoor:
 
-    public function __construct(Door $door)
-    {
-        $this->door = $door;
-    }
+    def __init__(self, door):
+        self.door = door
 
-    public function open($password)
-    {
-        if ($this->authenticate($password)) {
-            $this->door->open();
-        } else {
-            echo "Big no! It ain't possible.";
-        }
-    }
+    def open(self, password):
+        if self.authenticate(password):
+            self.door.open()
+        else:
+            print('Big NO! It ain\'t possible.')
 
-    public function authenticate($password)
-    {
-        return $password === '$ecr@t';
-    }
+    def authenticate(self, password):
+        return password == '$ecr@t'
 
-    public function close()
-    {
-        $this->door->close();
-    }
-}
+    def close(self):
+        self.door.close()
 ```
 And here is how it can be used
-```php
-$door = new SecuredDoor(new LabDoor());
-$door->open('invalid'); // Big no! It ain't possible.
+```python
+if __name__ == '__main__':
 
-$door->open('$ecr@t'); // Opening lab door
-$door->close(); // Closing lab door
+    door = SecurityDoor(LabDoor())
+    door.open('invalid')  # Big NO! It ain't possible.
+    door.open('$ecr@t')  # Opening lab door
+    door.close()  # Closing the lab door
 ```
 Yet another example would be some sort of data-mapper implementation. For example, I recently made an ODM (Object Data Mapper) for MongoDB using this pattern where I wrote a proxy around mongo classes while utilizing the magic method `__call()`. All the method calls were proxied to the original mongo class and result retrieved was returned as it is but in case of `find` or `findOne` data was mapped to the required class objects and the object was returned instead of `Cursor`.
 
@@ -1297,91 +1086,69 @@ Wikipedia says
 
 Translating our account example above. First of all we have a base account having the logic for chaining the accounts together and some accounts
 
-```php
-abstract class Account
-{
-    protected $successor;
-    protected $balance;
+```python
+class Account:
 
-    public function setNext(Account $account)
-    {
-        $this->successor = $account;
-    }
+    def __init__(self):
+        self.successor = None
+        self.balance = 0
 
-    public function pay(float $amountToPay)
-    {
-        if ($this->canPay($amountToPay)) {
-            echo sprintf('Paid %s using %s' . PHP_EOL, $amountToPay, get_called_class());
-        } elseif ($this->successor) {
-            echo sprintf('Cannot pay using %s. Proceeding ..' . PHP_EOL, get_called_class());
-            $this->successor->pay($amountToPay);
-        } else {
-            throw new Exception('None of the accounts have enough balance');
-        }
-    }
+    def set_next(self, account):
+        self.successor = account
 
-    public function canPay($amount): bool
-    {
-        return $this->balance >= $amount;
-    }
-}
+    def pay(self, amount_to_pay):
+        if self.can_pay(amount_to_pay):
+            print('Paid {} using {}'.format(
+                amount_to_pay, self.__class__.__name__))
+        elif self.successor:
+            print('Cannot pay using {}, Proceeding...'.format(
+                self.__class__.__name__))
+            self.successor.pay(amount_to_pay)
+        else:
+            raise Exception('None of the accounts have enough balance')
 
-class Bank extends Account
-{
-    protected $balance;
+    def can_pay(self, amount):
+        return self.balance >= amount
 
-    public function __construct(float $balance)
-    {
-        $this->balance = $balance;
-    }
-}
 
-class Paypal extends Account
-{
-    protected $balance;
+class Bank(Account):
 
-    public function __construct(float $balance)
-    {
-        $this->balance = $balance;
-    }
-}
+    def __init__(self, balance):
+        self.balance = balance
 
-class Bitcoin extends Account
-{
-    protected $balance;
 
-    public function __construct(float $balance)
-    {
-        $this->balance = $balance;
-    }
-}
+class PayPal(Account):
+
+    def __init__(self, balance):
+        self.balance = balance
+
+
+class Bitcoin(Account):
+
+    def __init__(self, balance):
+        self.balance = balance
 ```
 
 Now let's prepare the chain using the links defined above (i.e. Bank, Paypal, Bitcoin)
 
-```php
-// Let's prepare a chain like below
-//      $bank->$paypal->$bitcoin
-//
-// First priority bank
-//      If bank can't pay then paypal
-//      If paypal can't pay then bit coin
+```python
+if __name__ == '__main__':
 
-$bank = new Bank(100);          // Bank with balance 100
-$paypal = new Paypal(200);      // Paypal with balance 200
-$bitcoin = new Bitcoin(300);    // Bitcoin with balance 300
+    # Let's prepare a chain like below
+    #     bank->paypal->bitcoin
+    # First priority bank
+    # If bank can't pay then paypal
+    # If paypal can't pay then bit coin
+    bank = Bank(100)
+    paypal = PayPal(200)
+    bitcoin = Bitcoin(300)
+    bank.set_next(paypal)
+    paypal.set_next(bitcoin)
 
-$bank->setNext($paypal);
-$paypal->setNext($bitcoin);
-
-// Let's try to pay using the first priority i.e. bank
-$bank->pay(259);
-
-// Output will be
-// ==============
-// Cannot pay using bank. Proceeding ..
-// Cannot pay using paypal. Proceeding ..:
-// Paid 259 using Bitcoin!
+    bank.pay(259)
+    # Cannot pay using Bank, Proceeding...
+    # Cannot pay using PayPal, Proceeding...
+    # Paid 259 using Bitcoin
 ```
 
 👮 Command
@@ -1400,102 +1167,80 @@ Wikipedia says
 **Programmatic Example**
 
 First of all we have the receiver that has the implementation of every action that could be performed
-```php
-// Receiver
-class Bulb
-{
-    public function turnOn()
-    {
-        echo "Bulb has been lit";
-    }
+```python
+class Bulb:
+    # Receiver
 
-    public function turnOff()
-    {
-        echo "Darkness!";
-    }
-}
+    def turn_on(self):
+        print('Bulb has been lit')
+
+    def turn_off(self):
+        print('Darkness!')
 ```
 then we have an interface that each of the commands are going to implement and then we have a set of commands
-```php
-interface Command
-{
-    public function execute();
-    public function undo();
-    public function redo();
-}
+```python
+class Command:
 
-// Command
-class TurnOn implements Command
-{
-    protected $bulb;
+    def execute(self):
+        raise NotImplementedError
 
-    public function __construct(Bulb $bulb)
-    {
-        $this->bulb = $bulb;
-    }
+    def undo(self):
+        raise NotImplementedError
 
-    public function execute()
-    {
-        $this->bulb->turnOn();
-    }
+    def redo(self):
+        raise NotImplementedError
 
-    public function undo()
-    {
-        $this->bulb->turnOff();
-    }
 
-    public function redo()
-    {
-        $this->execute();
-    }
-}
+class TurnOn(Command):
 
-class TurnOff implements Command
-{
-    protected $bulb;
+    def __init__(self, bulb):
+        self.bulb = bulb
 
-    public function __construct(Bulb $bulb)
-    {
-        $this->bulb = $bulb;
-    }
+    def execute(self):
+        self.bulb.turn_on()
 
-    public function execute()
-    {
-        $this->bulb->turnOff();
-    }
+    def undo(self):
+        self.bulb.turn_off()
 
-    public function undo()
-    {
-        $this->bulb->turnOn();
-    }
+    def redo(self):
+        self.execute()
 
-    public function redo()
-    {
-        $this->execute();
-    }
-}
+
+class TurnOff(Command):
+
+    def __init__(self, bulb):
+        self.bulb = bulb
+
+    def execute(self):
+        self.bulb.turn_off()
+
+    def undo(self):
+        self.bulb.turn_on()
+
+    def rebo(self):
+        self.execute
 ```
 Then we have an `Invoker` with whom the client will interact to process any commands
-```php
-// Invoker
-class RemoteControl
-{
-    public function submit(Command $command)
-    {
-        $command->execute();
-    }
-}
+```python
+class RemoteControl:
+        # Invoker
+
+    def submit(self, command):
+        command.execute()
 ```
 Finally let's see how we can use it in our client
-```php
-$bulb = new Bulb();
+```python
+if __name__ == '__main__':
 
-$turnOn = new TurnOn($bulb);
-$turnOff = new TurnOff($bulb);
+    bulb = Bulb()
+    turn_on = TurnOn(bulb)
+    turn_off = TurnOff(bulb)
 
-$remote = new RemoteControl();
-$remote->submit($turnOn); // Bulb has been lit!
-$remote->submit($turnOff); // Darkness!
+    remote = RemoteControl()
+    remote.submit(turn_on)
+    remote.submit(turn_off)
+    # Bulb has been lit
+    # Darkness!
 ```
 
 Command pattern can also be used to implement a transaction based system. Where you keep maintaining the history of commands as soon as you execute them. If the final command is successfully executed, all good otherwise just iterate through the history and keep executing the `undo` on all the executed commands.
@@ -1516,94 +1261,76 @@ Wikipedia says
 
 In PHP it is quite easy to implement using SPL (Standard PHP Library). Translating our radio stations example from above. First of all we have `RadioStation`
 
-```php
-class RadioStation
-{
-    protected $frequency;
+```python
+class RadioStation:
 
-    public function __construct(float $frequency)
-    {
-        $this->frequency = $frequency;
-    }
+    def __init__(self, frequency):
+        self.frequency = frequency
 
-    public function getFrequency(): float
-    {
-        return $this->frequency;
-    }
-}
+    def get_frequency(self):
+        return self.frequency
 ```
 Then we have our iterator
 
-```php
-use Countable;
-use Iterator;
+```python
+class StationList:
 
-class StationList implements Countable, Iterator
-{
-    /** @var RadioStation[] $stations */
-    protected $stations = [];
+    def __init__(self):
+        self.stations = []
+        self.counter = 0
 
-    /** @var int $counter */
-    protected $counter;
+    def add_station(self, station):
+        self.stations.append(station)
 
-    public function addStation(RadioStation $station)
-    {
-        $this->stations[] = $station;
-    }
+    def remove_station(self, to_remove):
+        to_remove_frequency = to_remove.get_frequency()
+        self.stations = [s for s in self.stations if
+                         s.get_frequency() != to_remove_frequency]
 
-    public function removeStation(RadioStation $toRemove)
-    {
-        $toRemoveFrequency = $toRemove->getFrequency();
-        $this->stations = array_filter($this->stations, function (RadioStation $station) use ($toRemoveFrequency) {
-            return $station->getFrequency() !== $toRemoveFrequency;
-        });
-    }
+    def count(self):
+        return len(self.stations)
 
-    public function count(): int
-    {
-        return count($this->stations);
-    }
+    def current(self):
+        return self.stations[self.counter]
 
-    public function current(): RadioStation
-    {
-        return $this->stations[$this->counter];
-    }
+    def key(self):
+        return self.counter
 
-    public function key()
-    {
-        return $this->counter;
-    }
+    def next(self):
+        self.counter += 1
 
-    public function next()
-    {
-        $this->counter++;
-    }
-
-    public function rewind()
-    {
-        $this->counter = 0;
-    }
-
-    public function valid(): bool
-    {
-        return isset($this->stations[$this->counter]);
-    }
-}
+    def rewind(self):
+        self.counter = 0
 ```
 And then it can be used as
-```php
-$stationList = new StationList();
+```python
+if __name__ == '__main__':
 
-$stationList->addStation(new RadioStation(89));
-$stationList->addStation(new RadioStation(101));
-$stationList->addStation(new RadioStation(102));
-$stationList->addStation(new RadioStation(103.2));
+    station_list = StationList()
+    station_list.add_station(RadioStation(89))
+    station_list.add_station(RadioStation(101))
+    station_list.add_station(RadioStation(102))
+    station_list.add_station(RadioStation(103.2))
 
-foreach($stationList as $station) {
-    echo $station->getFrequency() . PHP_EOL;
-}
+    for i in range(station_list.count(), 0, -1):
+        print(station_list.current().get_frequency())
+        station_list.next()
 
-$stationList->removeStation(new RadioStation(89)); // Will remove station 89
+    # 89
+    # 101
+    # 102
+    # 103.2
+
+    station_list.remove_station(RadioStation(89))
+    station_list.rewind()
+
+    for i in range(station_list.count(), 0, -1):
+        print(station_list.current().get_frequency())
+        station_list.next()
+
+    # 101
+    # 102
+    # 103.2
 ```
 
 👽 Mediator
@@ -1624,58 +1351,48 @@ Here is the simplest example of a chat room (i.e. mediator) with users (i.e. col
 
 First of all, we have the mediator i.e. the chat room
 
-```php
-interface ChatRoomMediator 
-{
-    public function showMessage(User $user, string $message);
-}
+```python
+from datetime import datetime
 
-// Mediator
-class ChatRoom implements ChatRoomMediator
-{
-    public function showMessage(User $user, string $message)
-    {
-        $time = date('M d, y H:i');
-        $sender = $user->getName();
 
-        echo $time . '[' . $sender . ']:' . $message;
-    }
-}
+class ChatRoomMediator:
+    pass
+
+
+class ChatRoom(ChatRoomMediator):
+
+    def show_message(self, user, message):
+        time = datetime.now()
+        sender = user.get_name()
+        print('[{}] {}: {}'.format(time, sender, message))
 ```
 
 Then we have our users i.e. colleagues
-```php
-class User {
-    protected $name;
-    protected $chatMediator;
+```python
+class User:
 
-    public function __construct(string $name, ChatRoomMediator $chatMediator) {
-        $this->name = $name;
-        $this->chatMediator = $chatMediator;
-    }
+    def __init__(self, name, chat_room_mediator):
+        self.name = name
+        self.chat_room_mediator = chat_room_mediator
 
-    public function getName() {
-        return $this->name;
-    }
+    def get_name(self):
+        return self.name
 
-    public function send($message) {
-        $this->chatMediator->showMessage($this, $message);
-    }
-}
+    def send(self, message):
+        self.chat_room_mediator.show_message(self, message)
 ```
 And the usage
-```php
-$mediator = new ChatRoom();
+```python
+if __name__ == '__main__':
 
-$john = new User('John Doe', $mediator);
-$jane = new User('Jane Doe', $mediator);
-
-$john->send('Hi there!');
-$jane->send('Hey!');
-
-// Output will be
-// Feb 14, 10:58 [John]: Hi there!
-// Feb 14, 10:58 [Jane]: Hey!
+    mediator = ChatRoom()
+    john = User('John Doe', mediator)
+    jane = User('Jane Doe', mediator)
+    john.send('Hi there!')
+    jane.send('Hey!')
+    # Output:
+    # [2017-02-24 10:31:07.474657] John Doe: Hi there!
+    # [2017-02-24 10:31:07.475182] Jane Doe: Hey!
 ```
 
 💾 Memento
@@ -1697,74 +1414,54 @@ Lets take an example of text editor which keeps saving the state from time to ti
 
 First of all we have our memento object that will be able to hold the editor state
 
-```php
-class EditorMemento
-{
-    protected $content;
+```python
+class EditorMemento:
 
-    public function __construct(string $content)
-    {
-        $this->content = $content;
-    }
+    def __init__(self, content):
+        self.content = content
 
-    public function getContent()
-    {
-        return $this->content;
-    }
-}
+    def get_content(self):
+        return self.content
 ```
 
 Then we have our editor i.e. originator that is going to use memento object
 
-```php
-class Editor
-{
-    protected $content = '';
+```python
+class Editor:
 
-    public function type(string $words)
-    {
-        $this->content = $this->content . ' ' . $words;
-    }
+    def __init__(self):
+        self.content = ''
 
-    public function getContent()
-    {
-        return $this->content;
-    }
+    def type(self, words):
+        self.content = self.content + ' ' + words
 
-    public function save()
-    {
-        return new EditorMemento($this->content);
-    }
+    def get_content(self):
+        return self.content
 
-    public function restore(EditorMemento $memento)
-    {
-        $this->content = $memento->getContent();
-    }
-}
+    def save(self):
+        return EditorMemento(self.content)
+
+    def restore(self, memento):
+        self.content = memento.get_content()
 ```
 
 And then it can be used as
 
-```php
-$editor = new Editor();
+```python
+if __name__ == '__main__':
 
-// Type some stuff
-$editor->type('This is the first sentence.');
-$editor->type('This is second.');
+    editor = Editor()
+    editor.type('This is the first sentence.')
+    editor.type('This is second.')
 
-// Save the state to restore to : This is the first sentence. This is second.
-$saved = $editor->save();
+    saved = editor.save()
+    editor.type('And this is third.')
+    assert editor.get_content() == \
+        ' This is the first sentence. This is second. And this is third.'
 
-// Type some more
-$editor->type('And this is third.');
-
-// Output: Content before Saving
-echo $editor->getContent(); // This is the first sentence. This is second. And this is third.
-
-// Restoring to last saved state
-$editor->restore($saved);
-
-$editor->getContent(); // This is the first sentence. This is second.
+    editor.restore(saved)
+    assert editor.get_content() == \
+        ' This is the first sentence. This is second.'
 ```
 
 😎 Observer
@@ -1781,79 +1478,61 @@ Wikipedia says
 **Programmatic example**
 
 Translating our example from above. First of all we have job seekers that need to be notified for a job posting
-```php
-class JobPost
-{
-    protected $title;
+```python
+class JobPost:
 
-    public function __construct(string $title)
-    {
-        $this->title = $title;
-    }
+    def __init__(self, title):
+        self.title = title
 
-    public function getTitle()
-    {
-        return $this->title;
-    }
-}
+    def get_title(self):
+        return self.title
 
-class JobSeeker implements Observer
-{
-    protected $name;
 
-    public function __construct(string $name)
-    {
-        $this->name = $name;
-    }
+class JobSeeker:
 
-    public function onJobPosted(JobPost $job)
-    {
-        // Do something with the job posting
-        echo 'Hi ' . $this->name . '! New job posted: '. $job->getTitle();
-    }
-}
+    def __init__(self, name):
+        self.name = name
+
+    def on_job_post(self, job):
+        print('Hi {}! New job posted: {}'.format(self.name, job.title))
 ```
 Then we have our job postings to which the job seekers will subscribe
-```php
-class JobPostings implements Observable
-{
-    protected $observers = [];
+```python
+class JobPostings:
 
-    protected function notify(JobPost $jobPosting)
-    {
-        foreach ($this->observers as $observer) {
-            $observer->onJobPosted($jobPosting);
-        }
-    }
+    def __init__(self):
+        self.observers = list()
 
-    public function attach(Observer $observer)
-    {
-        $this->observers[] = $observer;
-    }
+    def notify(self, job_posting):
+        for observer in self.observers:
+            observer.on_job_post(job_posting)
 
-    public function addJob(JobPost $jobPosting)
-    {
-        $this->notify($jobPosting);
-    }
-}
+    def attach(self, observer):
+        self.observers.append(observer)
+
+    def add_job(self, job_posting):
+        self.notify(job_posting)
 ```
 Then it can be used as
-```php
-// Create subscribers
-$johnDoe = new JobSeeker('John Doe');
-$janeDoe = new JobSeeker('Jane Doe');
+```python
+if __name__ == '__main__':
 
-// Create publisher and attach subscribers
-$jobPostings = new JobPostings();
-$jobPostings->attach($johnDoe);
-$jobPostings->attach($janeDoe);
+    # create subscribers
+    john_doe = JobSeeker('John Doe')
+    jane_doe = JobSeeker('Jane Doe')
+    kane_doe = JobSeeker('Kane Doe')
 
-// Add a new job and see if subscribers get notified
-$jobPostings->addJob(new JobPost('Software Engineer'));
+    # create publisher and attach subscribers
+    job_posting = JobPostings()
+    job_posting.attach(john_doe)
+    job_posting.attach(jane_doe)
 
-// Output
-// Hi John Doe! New job posted: Software Engineer
-// Hi Jane Doe! New job posted: Software Engineer
+    # add a new job and see if subscribers get notified
+    job_posting.add_job(JobPost('Software Engineer'))
+
+    # output:
+    # Hi John Doe! New job posted: Software Engineer
+    # Hi Jane Doe! New job posted: Software Engineer
 ```
 
 🏃 Visitor
@@ -1871,128 +1550,106 @@ Wikipedia says
 
 Let's take an example of a zoo simulation where we have several different kinds of animals and we have to make them Sound. Let's translate this using visitor pattern
 
-```php
-// Visitee
-interface Animal
-{
-    public function accept(AnimalOperation $operation);
-}
+```python
+class Animal:
+    # visitee
 
-// Visitor
-interface AnimalOperation
-{
-    public function visitMonkey(Monkey $monkey);
-    public function visitLion(Lion $lion);
-    public function visitDolphin(Dolphin $dolphin);
-}
+    def accept(operation):
+        raise NotImplementedError
+
+
+class AnimalOperation:
+    # visitor
+
+    def visit_monkey(monkey):
+        raise NotImplementedError
+
+    def visit_lion(lion):
+        raise NotImplementedError
+
+    def visit_dolphin(dolphin):
+        raise NotImplementedError
 ```
 Then we have our implementations for the animals
-```php
-class Monkey implements Animal
-{
-    public function shout()
-    {
-        echo 'Ooh oo aa aa!';
-    }
+```python
+class Monkey(Animal):
 
-    public function accept(AnimalOperation $operation)
-    {
-        $operation->visitMonkey($this);
-    }
-}
+    def shout(self):
+        print('Ooh oo aa aa!')
 
-class Lion implements Animal
-{
-    public function roar()
-    {
-        echo 'Roaaar!';
-    }
+    def accept(self, operation):
+        operation.visit_monkey(self)
 
-    public function accept(AnimalOperation $operation)
-    {
-        $operation->visitLion($this);
-    }
-}
 
-class Dolphin implements Animal
-{
-    public function speak()
-    {
-        echo 'Tuut tuttu tuutt!';
-    }
+class Lion(Animal):
 
-    public function accept(AnimalOperation $operation)
-    {
-        $operation->visitDolphin($this);
-    }
-}
+    def roar(self):
+        print('Roaaar!')
+
+    def accept(self, operation):
+        operation.visit_lion(self)
+
+
+class Dolphin(Animal):
+
+    def speak(self):
+        print('Tuut tuttu tuutt!')
+
+    def accept(self, operation):
+        operation.visit_dolphin(self)
 ```
 Let's implement our visitor
-```php
-class Speak implements AnimalOperation
-{
-    public function visitMonkey(Monkey $monkey)
-    {
-        $monkey->shout();
-    }
+```python
+class Speak(AnimalOperation):
 
-    public function visitLion(Lion $lion)
-    {
-        $lion->roar();
-    }
+    def visit_monkey(self, monkey):
+        monkey.shout()
 
-    public function visitDolphin(Dolphin $dolphin)
-    {
-        $dolphin->speak();
-    }
-}
+    def visit_lion(self, lion):
+        lion.roar()
+
+    def visit_dolphin(self, dolphin):
+        dolphin.speak()
 ```
 
 And then it can be used as
 ```php
-$monkey = new Monkey();
-$lion = new Lion();
-$dolphin = new Dolphin();
+monkey = Monkey()
+lion = Lion()
+dolphin = Dolphin()
 
-$speak = new Speak();
 
-$monkey->accept($speak);    // Ooh oo aa aa!    
-$lion->accept($speak);      // Roaaar!
-$dolphin->accept($speak);   // Tuut tutt tuutt!
+speak = Speak()
+
+monkey.accept(speak)  # Ooh oo aa aa!   
+lion.accept(speak)  # Roaaar!
+dolphin.accept(speak)  # Tuut tuttu tuutt!
 ```
 We could have done this simply by having an inheritance hierarchy for the animals but then we would have to modify the animals whenever we would have to add new actions to animals. But now we will not have to change them. For example, let's say we are asked to add the jump behavior to the animals, we can simply add that by creating a new visitor i.e.
 
-```php
-class Jump implements AnimalOperation
-{
-    public function visitMonkey(Monkey $monkey)
-    {
-        echo 'Jumped 20 feet high! on to the tree!';
-    }
+```python
+class Jump(AnimalOperation):
 
-    public function visitLion(Lion $lion)
-    {
-        echo 'Jumped 7 feet! Back on the ground!';
-    }
+    def visit_monkey(self, monkey):
+        print('Jumped 20 feet high! on to the tree!')
 
-    public function visitDolphin(Dolphin $dolphin)
-    {
-        echo 'Walked on water a little and disappeared';
-    }
-}
+    def visit_lion(self, lion):
+        print('Jumped 7 feet! Back on the ground!')
+
+    def visit_dolphin(self, dolphin):
+        print('Walked on water a little and disappeared.')
 ```
 And for the usage
-```php
-$jump = new Jump();
+```python
+jump = Jump()
+monkey.accept(speak)  # Ooh oo aa aa!
+monkey.accept(jump)  # Jumped 20 feet high! on to the tree!
 
-$monkey->accept($speak);   // Ooh oo aa aa!
-$monkey->accept($jump);    // Jumped 20 feet high! on to the tree!
+lion.accept(speak)  # Roaaar!
+lion.accept(jump)  # Jumped 7 feet! Back on the ground!
 
-$lion->accept($speak);     // Roaaar!
-$lion->accept($jump);      // Jumped 7 feet! Back on the ground!
-
-$dolphin->accept($speak);  // Tuut tutt tuutt!
-$dolphin->accept($jump);   // Walked on water a little and disappeared
+dolphin.accept(speak)  # Tuut tuttu tuutt!
+dolphin.accept(jump)  # Walked on water a little and disappeared.
 ```
 
 💡 Strategy
@@ -2011,61 +1668,47 @@ Wikipedia says
 
 Translating our example from above. First of all we have our strategy interface and different strategy implementations
 
-```php
-interface SortStrategy
-{
-    public function sort(array $dataset): array;
-}
+```python
+class SortStrategy:
 
-class BubbleSortStrategy implements SortStrategy
-{
-    public function sort(array $dataset): array
-    {
-        echo "Sorting using bubble sort";
+    def sort(self, data):
+        raise NotImplementedError
 
-        // Do sorting
-        return $dataset;
-    }
-}
 
-class QuickSortStrategy implements SortStrategy
-{
-    public function sort(array $dataset): array
-    {
-        echo "Sorting using quick sort";
+class BubbleSortStrategy(SortStrategy):
 
-        // Do sorting
-        return $dataset;
-    }
-}
+    def sort(self, data):
+        print('Sorting using bubble sort')
+        return data
+
+
+class QuickSortStrategy(SortStrategy):
+
+    def sort(self, data):
+        print('Sorting using quick sort')
+        return data
 ```
 
 And then we have our client that is going to use any strategy
-```php
-class Sorter
-{
-    protected $sorter;
+```python
+class Sorter:
 
-    public function __construct(SortStrategy $sorter)
-    {
-        $this->sorter = $sorter;
-    }
+    def __init__(self, sorter):
+        self.sorter = sorter
 
-    public function sort(array $dataset): array
-    {
-        return $this->sorter->sort($dataset);
-    }
-}
+    def sort(self, data):
+        return self.sorter.sort(data)
 ```
 And it can be used as
-```php
-$dataset = [1, 5, 4, 3, 2, 8];
+```python
+if __name__ == '__main__':
 
-$sorter = new Sorter(new BubbleSortStrategy());
-$sorter->sort($dataset); // Output : Sorting using bubble sort
+    data = [1, 5, 4, 3, 2, 8]
+    sorter = Sorter(BubbleSortStrategy())
+    sorter.sort(data)  # Sorting using bubble sort
 
-$sorter = new Sorter(new QuickSortStrategy());
-$sorter->sort($dataset); // Output : Sorting using quick sort
+    sorter = Sorter(QuickSortStrategy())
+    sorter.sort(data)  # Sorting using quick sort
 ```
 
 💢 State
@@ -2086,80 +1729,63 @@ Let's take an example of text editor, it lets you change the state of text that 
 
 First of all we have our state interface and some state implementations
 
-```php
-interface WritingState
-{
-    public function write(string $words);
-}
+```python
+class WritingState:
 
-class UpperCase implements WritingState
-{
-    public function write(string $words)
-    {
-        echo strtoupper($words);
-    }
-}
+    def write(self, words):
+        raise NotImplementedError
 
-class LowerCase implements WritingState
-{
-    public function write(string $words)
-    {
-        echo strtolower($words);
-    }
-}
 
-class DefaultText implements WritingState
-{
-    public function write(string $words)
-    {
-        echo $words;
-    }
-}
+class UpperCase(WritingState):
+
+    def write(self, words):
+        print(words.upper())
+
+
+class LowerCase(WritingState):
+
+    def write(self, words):
+        print(words.lower())
+
+
+class Default(WritingState):
+
+    def write(self, words):
+        print(words)
 ```
 Then we have our editor
-```php
-class TextEditor
-{
-    protected $state;
+```python
+class TextEditor:
 
-    public function __construct(WritingState $state)
-    {
-        $this->state = $state;
-    }
+    def __init__(self, state):
+        self.state = state
 
-    public function setState(WritingState $state)
-    {
-        $this->state = $state;
-    }
+    def set_state(self, state):
+        self.state = state
 
-    public function type(string $words)
-    {
-        $this->state->write($words);
-    }
-}
+    def type(self, words):
+        self.state.write(words)
 ```
 And then it can be used as
-```php
-$editor = new TextEditor(new DefaultText());
+```python
+if __name__ == '__main__':
 
-$editor->type('First line');
+    editor = TextEditor(Default())
+    editor.type('First line')
 
-$editor->setState(new UpperCase());
+    editor.set_state(UpperCase())
+    editor.type('Second line')
+    editor.type('Third line')
 
-$editor->type('Second line');
-$editor->type('Third line');
+    editor.set_state(LowerCase())
+    editor.type('Fourth line')
+    editor.type('Fifth line')
 
-$editor->setState(new LowerCase());
-
-$editor->type('Fourth line');
-$editor->type('Fifth line');
-
-// Output:
-// First line
-// SECOND LINE
-// THIRD LINE
-// fourth line
-// fifth line
+    # First line
+    # SECOND LINE
+    # THIRD LINE
+    # fourth line
+    # fifth line
 ```
 
 📒 Template Method
@@ -2185,95 +1811,80 @@ Wikipedia says
 Imagine we have a build tool that helps us test, lint, build, generate build reports (i.e. code coverage reports, linting report etc) and deploy our app on the test server.
 
 First of all we have our base class that specifies the skeleton for the build algorithm
-```php
-abstract class Builder
-{
+```python
+class Builder:
 
-    // Template method
-    final public function build()
-    {
-        $this->test();
-        $this->lint();
-        $this->assemble();
-        $this->deploy();
-    }
+    def build(self):
+        self.test()
+        self.lint()
+        self.assemble()
+        self.deploy()
 
-    abstract public function test();
-    abstract public function lint();
-    abstract public function assemble();
-    abstract public function deploy();
-}
+    def test(self):
+        raise NotImplementedError
+
+    def lint(self):
+        raise NotImplementedError
+
+    def assemble(self):
+        raise NotImplementedError
+
+    def deploy(self):
+        raise NotImplementedError
 ```
 
 Then we can have our implementations
 
-```php
-class AndroidBuilder extends Builder
-{
-    public function test()
-    {
-        echo 'Running android tests';
-    }
+```python
+class AndroidBuilder(Builder):
 
-    public function lint()
-    {
-        echo 'Linting the android code';
-    }
+    def test(self):
+        print('Running Android tests')
 
-    public function assemble()
-    {
-        echo 'Assembling the android build';
-    }
+    def lint(self):
+        print('Linting the Android code')
 
-    public function deploy()
-    {
-        echo 'Deploying android build to server';
-    }
-}
+    def assemble(self):
+        print('Assembling the Android build')
 
-class IosBuilder extends Builder
-{
-    public function test()
-    {
-        echo 'Running ios tests';
-    }
+    def deploy(self):
+        print('Deploying Android build to server')
 
-    public function lint()
-    {
-        echo 'Linting the ios code';
-    }
 
-    public function assemble()
-    {
-        echo 'Assembling the ios build';
-    }
+class IosBuilder(Builder):
 
-    public function deploy()
-    {
-        echo 'Deploying ios build to server';
-    }
-}
+    def test(self):
+        print('Running iOS tests')
+
+    def lint(self):
+        print('Linting the iOS code')
+
+    def assemble(self):
+        print('Assembling the iOS build')
+
+    def deploy(self):
+        print('Deploying iOS build to server')
 ```
 And then it can be used as
 
-```php
-$androidBuilder = new AndroidBuilder();
-$androidBuilder->build();
+```python
+if __name__ == '__main__':
 
-// Output:
-// Running android tests
-// Linting the android code
-// Assembling the android build
-// Deploying android build to server
+    android_builder = AndroidBuilder()
+    android_builder.build()
+    # output:
+    # Running Android tests
+    # Linting the Android code
+    # Assembling the Android build
+    # Deploying Android build to server
 
-$iosBuilder = new IosBuilder();
-$iosBuilder->build();
-
-// Output:
-// Running ios tests
-// Linting the ios code
-// Assembling the ios build
-// Deploying ios build to server
+    ios_builder = IosBuilder()
+    ios_builder.build()
+    # output:
+    # Running iOS tests
+    # Linting the iOS code
+    # Assembling the iOS build
+    # Deploying iOS build to server
 ```
 
 ## 🚦 Wrap Up Folks
